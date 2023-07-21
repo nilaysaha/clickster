@@ -1,2 +1,2 @@
-# clickster
+# Clicklister
 repo containing example assignment
