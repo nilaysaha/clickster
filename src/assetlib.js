@@ -1,7 +1,7 @@
 "use strict"
 
 require('dotenv').config();
-const { Asset, Category, Collection } = require('./models/asset') 
+const { Asset, Category, Collection } = require('./model/asset') 
 
 
 const init_or_find_category = async (title, description) => {
@@ -11,11 +11,14 @@ const init_or_find_category = async (title, description) => {
         }
         else{
 
-            return  await Category.findOrCreate({
+            const newCategory =  await Category.findOrCreate({
                 where: { title: title },
                 raw : true
             })
-           
+
+            console.log(newCategory)
+            
+            return newCategory    
         }
     }
     catch(err)
@@ -25,7 +28,7 @@ const init_or_find_category = async (title, description) => {
     
 }
 
-const map_asset_to_category = async( assetID, categoryID){
+const map_asset_to_category = async( assetID, categoryID) => {
     try{
         if ((assetID == null )  || (categoryID == null)){
             throw new Error("Empty or undefined assetid/categoryid param for creating category")
@@ -45,7 +48,7 @@ const map_asset_to_category = async( assetID, categoryID){
     
 }
 
-const reconstruct_asset_information = async (assetID){
+const reconstruct_asset_information = async (assetID) => {
     try{
         //First fetch the asset info
         if (assetID == null   || assetID == undefined){

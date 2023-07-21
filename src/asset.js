@@ -1,9 +1,9 @@
 "use strict";
 
 require('dotenv').config();
-const { Asset, Category, Collection } = require('./models/asset')
+const { Asset, Category, Collection, Asset2Category } = require('./model/asset')
 const {
-    initCategory,
+    init_or_find_category,
     map_asset_to_category,
     reconstruct_asset_information
 } = require('./assetlib')
@@ -28,28 +28,36 @@ const proutes  = async (fastify) => {
         try
         {
             const { body } = request
-
+            
             //validate input
-            if (Object.hasOwnProperty('type')  && Object.hasOwnProperty('categories')){
+            if (body.hasOwnProperty('type')  && body.hasOwnProperty('categories')){
 
                 //First create an asset entry
                 const payload = {
                     type: body.type
-                }                
-                const newAsset = await Asset.create(payload);
+                }
+                
+                let newAsset = await Asset.create(payload);
                 newAsset = newAsset.toJSON()
 
+                console.log(body.categories)
+                
                 //Now create categories if they do not exist
-                const categories  =  Promise.all(body.categories.map( c => {
-                    
-                    return init_or_find_category(c, "sample category")
+                const categories  =  Promise.all(body.categories.map(async(c) => {
+                    console.log(`dealing with category:${c}`)
+                    const c1 = await init_or_find_category(c, "sample category")
+                    console.log(c1)
+                    return c1
                 }))
 
-                //Now map asset to categories
-                categories.map( c => {
-                    map_asset_to_category( newAsset.id, c.id )
-                })                
+                console.log('--------------MAPPING ASSET TO CATEGORY-----------------')
                 
+                //Now map asset to categories
+                const cmapping = Promise.all(body.categories.map( async(c) => {
+                    await map_asset_to_category( newAsset.id, c.id )
+                }))                
+
+                return reply.status(201).send(newAsset);
             }
             else
             {
@@ -70,7 +78,7 @@ const proutes  = async (fastify) => {
                 throw new Error('empty or undefined assetID passed')
             }
             else{
-                const payload reconstruct_asset_information(assetID)
+                const payload = reconstruct_asset_information(assetID)
                 return reply.status(201).send(payload);
             }
             
@@ -81,5 +89,9 @@ const proutes  = async (fastify) => {
     
     })
 
+}
 
-   
+
+module.exports = {
+    proutes
+}

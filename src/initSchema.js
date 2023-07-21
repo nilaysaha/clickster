@@ -8,7 +8,8 @@ async function createSchema() {
 
     // Define your schema creation queries here
     const schemaQueries = [
-      'CREATE TABLE IF NOT EXISTS migrations (id SERIAL PRIMARY KEY, name VARCHAR(50))'
+        'CREATE TABLE IF NOT EXISTS migrations (id SERIAL PRIMARY KEY, name VARCHAR(50))',
+        'CREATE SCHEMA cliplister AUTHORIZATION hamnusli '
     ];
 
     for (const query of schemaQueries) {
